@@ -1,5 +1,6 @@
 package br.com.apirest.vetshop.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,9 +51,27 @@ public class PedidoController {
     private IPedidoProdutoRepository pedidoProdutoRepository;
 
     @GetMapping
-    public ResponseEntity<List<Pedido>> getAllPedidos() {
+    public ResponseEntity<List<BuscarPedidoDTO>> getAllPedidos() {
         List<Pedido> pedidos = pedidoService.findAll();
-        return new ResponseEntity<>(pedidos, HttpStatus.OK);
+        List<BuscarPedidoDTO> buscarPedidoDTOs = new ArrayList<>();
+
+        for (Pedido pedido : pedidos) {
+            List<Produto> produtos = findProdutosByPedidoId(pedido.getId());
+
+            BuscarPedidoDTO buscarPedidoDTO = new BuscarPedidoDTO(
+                pedido.getId(),
+                pedido.getNome(),
+                pedido.getCliente(),
+                pedido.getFornecedor(),
+                produtos,
+                pedido.getDataDeInclusao(),
+                pedido.getDataDeAlteracao()
+            );
+
+            buscarPedidoDTOs.add(buscarPedidoDTO);
+        }
+
+        return new ResponseEntity<>(buscarPedidoDTOs, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
