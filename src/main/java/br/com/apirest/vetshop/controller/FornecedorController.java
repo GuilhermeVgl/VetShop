@@ -1,9 +1,6 @@
 package br.com.apirest.vetshop.controller;
 
 import br.com.apirest.vetshop.model.Fornecedor;
-import br.com.apirest.vetshop.model.Pedido;
-import br.com.apirest.vetshop.repository.IPedidoProdutoRepository;
-import br.com.apirest.vetshop.repository.IPedidoRepository;
 import br.com.apirest.vetshop.service.FornecedorService;
 import jakarta.transaction.Transactional;
 
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/fornecedores")
@@ -24,12 +20,6 @@ public class FornecedorController {
 
     @Autowired
     private FornecedorService fornecedorService;
-
-    @Autowired
-    private IPedidoRepository pedidoRepository;
-
-    @Autowired
-    private IPedidoProdutoRepository iPedidoProdutoRepository;
 
     @GetMapping
     public ResponseEntity<List<Fornecedor>> getAllFornecedores() {
@@ -80,12 +70,6 @@ public class FornecedorController {
         Optional<Fornecedor> fornecedorToDelete = fornecedorService.findById(id);
         if (!fornecedorToDelete.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        Set<Pedido> pedidos = pedidoRepository.findByFornecedorId(id);
-        for (Pedido pedido : pedidos) {
-            iPedidoProdutoRepository.deleteByPedidoId(pedido.getId());
-            pedidoRepository.delete(pedido);
         }
 
         fornecedorService.Delete(fornecedorToDelete.get());
